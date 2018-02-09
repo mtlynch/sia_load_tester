@@ -24,8 +24,11 @@ def main(args):
     configure_logging()
     logger.info('Started runnning')
     input_dataset = dataset.load_from_path(args.dataset_root)
+    # TODO(mtlynch): Ensure 50 contracts are formed.
+    # TODO(mtlynch): Create upload queue.
     uploader = dataset_uploader.make_dataset_uploader(input_dataset)
-    uploader.start()
+    uploader.upload()
+    # TODO(mtlynch): Dump state.
 
 
 if __name__ == '__main__':
