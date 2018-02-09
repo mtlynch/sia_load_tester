@@ -89,6 +89,11 @@ class SiaClient(object):
         self._api_impl = api_impl
         self._sleep_fn = sleep_fn
 
+    def allowance_budget(self):
+        """Returns the amount budgeted for renter allowance (in hastings)."""
+        return long(
+            self._api_impl.get_renter()[u'settings'][u'allowance'][u'funds'])
+
     def renter_files(self):
         """Returns a list of files known to the Sia renter."""
         return self._api_impl.get_renter_files()[u'files']
