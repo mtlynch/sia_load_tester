@@ -31,11 +31,11 @@ class DatasetUploader(object):
         self._sia_client = sia_client
         self._sleep_fn = sleep_fn
 
-    def start(self):
-        """Starts the upload process
+    def upload(self):
+        """Uploads the dataset to Sia.
 
-        Begins the upload process and does not return until all files in the
-        dataset are fully uploaded to Sia.
+        Uploads and does not return until all files in the dataset are fully
+        uploaded to Sia.
         """
         while not self._upload_queue.empty():
             if self._too_many_uploads_in_progress():
@@ -46,6 +46,7 @@ class DatasetUploader(object):
             next_file_path = self._upload_queue.get()
             logger.info('Uploading next file to Sia: %s', next_file_path)
             self._upload_file_to_sia_async(next_file_path)
+        # TODO(mtlynch): Wait for uploadprogress to reach 100 for all files.
 
     def _too_many_uploads_in_progress(self):
         return self._count_uploads_in_progress() >= _MAX_CONCURRENT_UPLOADS
