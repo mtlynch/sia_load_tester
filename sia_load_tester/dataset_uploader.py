@@ -25,7 +25,8 @@ class DatasetUploader(object):
             input_dataset: The Dataset of files to upload to Sia.
             sia_client: An implementation of the Sia client API.
             sleep_fn: A callback function for putting the thread to sleep for
-                a given number of seconds."""
+                a given number of seconds.
+        """
         self._dataset_root = input_dataset.root_dir
         self._upload_queue = _UploadQueue(input_dataset, sia_client)
         self._sia_client = sia_client
