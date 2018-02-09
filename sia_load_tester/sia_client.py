@@ -9,6 +9,10 @@ import requests
 logger = logging.getLogger(__name__)
 
 _MAX_REQUEST_ATTEMPTS = 5
+# Use a 3 month allowance period. This mirrors Sia-UI's behavior for allowance
+# period:
+# https://github.com/NebulousLabs/Sia-UI/blob/8c4b271fd29066c4beccade1274715ef32c4cb6d/plugins/Files/js/sagas/helpers.js#L7-L9
+_ALLOWANCE_PERIOD = 4320 * 3
 
 
 class Error(Exception):
@@ -93,6 +97,20 @@ class SiaClient(object):
         """Returns the amount budgeted for renter allowance (in hastings)."""
         return long(
             self._api_impl.get_renter()[u'settings'][u'allowance'][u'funds'])
+
+    def set_allowance_budget(self, budget_hastings):
+        """Sets the allowance budget to the amount specified
+
+        Args:
+            budget_hastings: The amount to set the allowance budget to (in
+                hastings).
+
+        Returns:
+            True on success.
+        """
+
+        return self._api_impl.set_renter(
+            budget_hastings, period=_ALLOWANCE_PERIOD)
 
     def is_wallet_locked(self):
         return not self._api_impl.get_wallet()[u'unlocked']

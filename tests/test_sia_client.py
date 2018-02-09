@@ -57,6 +57,12 @@ class SiaClientTest(unittest.TestCase):
         }
         self.assertEqual(0, self.sia_client.allowance_budget())
 
+    def test_set_allowance_budget_sets_allowance_budget(self):
+        self.sia_client.set_allowance_budget(500000000000000000000000000)
+
+        self.mock_sia_api_impl.set_renter.assert_called_with(
+            500000000000000000000000000, period=12960)
+
     def test_is_wallet_locked_returns_true_when_wallet_is_locked(self):
         self.mock_sia_api_impl.get_wallet.return_value = {
             u'dustthreshold': u'30000000000000000000',
