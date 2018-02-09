@@ -25,6 +25,13 @@ def make_sia_client():
 
 
 def _NetworkErrorChecking(func):
+    """Decorator for wrapping function calls with an error handler
+
+    Function decorator that wraps the function in a handler for network errors.
+    Every time there's an error, it calls the calling SiaClient instance's
+    _sleep_fn method to wait an increasing amount of time until the next call,
+    for a maximum of _MAX_REQUEST_ATTEMPTS calls.
+    """
 
     @functools.wraps(func)
     def wrapper(*a, **kw):
@@ -39,6 +46,7 @@ def _NetworkErrorChecking(func):
                                e.message, sleep_seconds)
                 sia_client._sleep_fn(sleep_seconds)
                 continue
+        # Make one last try. If it fails, raise a custom error.
         try:
             return func(*a, **kw)
         except requests.exceptions.ConnectionError as e:
@@ -49,6 +57,10 @@ def _NetworkErrorChecking(func):
 
 
 def _decorate_all_methods(decorator):
+    """Class decorator which adds a function decorator to a class's methods.
+
+    Applies a function decorator to all methods in the decorated class.
+    """
 
     def apply_decorator(cls):
         for k, f in cls.__dict__.items():
