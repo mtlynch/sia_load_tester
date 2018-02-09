@@ -14,6 +14,49 @@ class SiaClientTest(unittest.TestCase):
         self.sia_client = sia_client.SiaClient(self.mock_sia_api_impl,
                                                self.mock_sleep_fn)
 
+    def test_allowance_budget_returns_balance_when_budget_is_set(self):
+        self.mock_sia_api_impl.get_renter.return_value = {
+            u'financialmetrics': {
+                u'downloadspending': u'0',
+                u'unspent': u'302462066279572839648071822',
+                u'storagespending': u'708366410084333683830174',
+                u'uploadspending': u'162900643676160001431357',
+                u'contractspending': u'196666666666666666666666647'
+            },
+            u'currentperiod': 141021,
+            u'settings': {
+                u'allowance': {
+                    u'funds': u'500000000000000000000000000',
+                    u'renewwindow': 2160,
+                    u'hosts': 50,
+                    u'period': 4320
+                }
+            }
+        }
+        self.assertEqual(500000000000000000000000000,
+                         self.sia_client.allowance_budget())
+
+    def test_allowance_budget_returns_zero_when_no_budget_is_zero(self):
+        self.mock_sia_api_impl.get_renter.return_value = {
+            u'financialmetrics': {
+                u'downloadspending': u'0',
+                u'unspent': u'0',
+                u'storagespending': u'0',
+                u'uploadspending': u'0',
+                u'contractspending': u'0'
+            },
+            u'currentperiod': 0,
+            u'settings': {
+                u'allowance': {
+                    u'funds': u'0',
+                    u'renewwindow': 0,
+                    u'hosts': 0,
+                    u'period': 0
+                }
+            }
+        }
+        self.assertEqual(0, self.sia_client.allowance_budget())
+
     def test_renter_files_returns_all_files(self):
         self.mock_sia_api_impl.get_renter_files.return_value = {
             u'files': [
