@@ -11,8 +11,9 @@ class DatasetUploaderTest(unittest.TestCase):
 
     def setUp(self):
         self.mock_sia_api_impl = mock.Mock()
-        self.mock_sia_client = sc.SiaClient(self.mock_sia_api_impl)
         self.mock_sleep_fn = mock.Mock()
+        self.mock_sia_client = sc.SiaClient(self.mock_sia_api_impl,
+                                            self.mock_sleep_fn)
 
     def test_exits_when_all_files_are_on_sia(self):
         dummy_dataset = dataset.Dataset('/dummy-path',
