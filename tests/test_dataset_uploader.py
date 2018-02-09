@@ -4,18 +4,20 @@ import mock
 
 from sia_load_tester import dataset
 from sia_load_tester import dataset_uploader
+from sia_load_tester import sia_client as sc
 
 
 class DatasetUploaderTest(unittest.TestCase):
 
     def setUp(self):
-        self.mock_sia = mock.Mock()
+        self.mock_sia_api_impl = mock.Mock()
+        self.mock_sia_client = sc.SiaClient(self.mock_sia_api_impl)
         self.mock_sleep_fn = mock.Mock()
 
     def test_exits_when_all_files_are_on_sia(self):
         dummy_dataset = dataset.Dataset('/dummy-path',
                                         ['a.txt', 'b.txt', 'c.txt'])
-        self.mock_sia.get_renter_files.return_value = {
+        self.mock_sia_api_impl.get_renter_files.return_value = {
             u'files': [
                 {
                     u'available': True,
@@ -53,14 +55,14 @@ class DatasetUploaderTest(unittest.TestCase):
             ]
         }
         uploader = dataset_uploader.DatasetUploader(
-            dummy_dataset, self.mock_sia, self.mock_sleep_fn)
+            dummy_dataset, self.mock_sia_client, self.mock_sleep_fn)
         uploader.start()
-        self.assertEqual(0, self.mock_sia.set_renter_upload.call_count)
+        self.assertEqual(0, self.mock_sia_api_impl.set_renter_upload.call_count)
 
     def test_uploads_file_when_one_is_missing_from_sia(self):
         dummy_dataset = dataset.Dataset('/dummy-path',
                                         ['a.txt', 'b.txt', 'c.txt'])
-        self.mock_sia.get_renter_files.return_value = {
+        self.mock_sia_api_impl.get_renter_files.return_value = {
             u'files': [
                 {
                     u'available': True,
@@ -87,7 +89,7 @@ class DatasetUploaderTest(unittest.TestCase):
             ]
         }
         uploader = dataset_uploader.DatasetUploader(
-            dummy_dataset, self.mock_sia, self.mock_sleep_fn)
+            dummy_dataset, self.mock_sia_client, self.mock_sleep_fn)
         uploader.start()
-        self.mock_sia.set_renter_upload.assert_called_once_with(
+        self.mock_sia_api_impl.set_renter_upload.assert_called_once_with(
             'c.txt', source='/dummy-path/c.txt')

@@ -2,7 +2,7 @@ import logging
 import os
 import time
 
-import pysia
+import sia_client as sc
 
 _MAX_CONCURRENT_UPLOADS = 5
 _SLEEP_SECONDS = 15
@@ -11,24 +11,24 @@ logger = logging.getLogger(__name__)
 
 
 def make_dataset_uploader(input_dataset):
-    """Factory method for creating an Uploader using production settings."""
-    return DatasetUploader(input_dataset, pysia.Sia(), time.sleep)
+    """Factory for creating a DatasetUploader using production settings."""
+    return DatasetUploader(input_dataset, sc.make_sia_client(), time.sleep)
 
 
 class DatasetUploader(object):
     """Uploads a full dataset of files to Sia."""
 
-    def __init__(self, input_dataset, sia, sleep_fn):
+    def __init__(self, input_dataset, sia_client, sleep_fn):
         """Creates a new DatasetUploader instance.
 
         Args:
             input_dataset: The Dataset of files to upload to Sia.
-            sia: An implementation of the Sia client API.
+            sia_client: An implementation of the Sia client API.
             sleep_fn: A callback function for putting the thread to sleep for
                 a given number of seconds."""
         self._dataset_root = input_dataset.root_dir
-        self._upload_queue = _UploadQueue(input_dataset, sia)
-        self._sia = sia
+        self._upload_queue = _UploadQueue(input_dataset, sia_client)
+        self._sia_client = sia_client
         self._sleep_fn = sleep_fn
 
     def start(self):
@@ -52,7 +52,7 @@ class DatasetUploader(object):
 
     def _count_uploads_in_progress(self):
         n = 0
-        for sia_file in _get_renter_files(self._sia):
+        for sia_file in self._sia_client.renter_files():
             if sia_file[u'uploadprogress'] < 100:
                 n += 1
         return n
@@ -68,7 +68,7 @@ class DatasetUploader(object):
             local_path: Path to local file to upload to Sia.
         """
         sia_path = os.path.relpath(local_path, self._dataset_root)
-        return self._sia.set_renter_upload(sia_path, source=local_path)
+        return self._sia_client.upload_file_async(local_path, sia_path)
 
 
 class _UploadQueue(object):
@@ -93,14 +93,9 @@ class _UploadQueue(object):
         return len(self._file_queue) == 0
 
 
-def _generate_file_queue(input_dataset, sia):
+def _generate_file_queue(input_dataset, sia_client):
     local_paths = [
         os.path.join(input_dataset.root_dir, f) for f in input_dataset.filenames
     ]
-    sia_paths = [f[u'localpath'] for f in _get_renter_files(sia)]
+    sia_paths = [f[u'localpath'] for f in sia_client.renter_files()]
     return list(set(local_paths) - set(sia_paths))
-
-
-def _get_renter_files(sia_api):
-    """Retrieves the list of files known to Sia."""
-    return sia_api.get_renter_files()[u'files']
