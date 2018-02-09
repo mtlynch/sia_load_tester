@@ -57,6 +57,34 @@ class SiaClientTest(unittest.TestCase):
         }
         self.assertEqual(0, self.sia_client.allowance_budget())
 
+    def test_is_wallet_locked_returns_true_when_wallet_is_locked(self):
+        self.mock_sia_api_impl.get_wallet.return_value = {
+            u'dustthreshold': u'30000000000000000000',
+            u'unlocked': False,
+            u'encrypted': True,
+            u'confirmedsiacoinbalance': u'500000000000000000000000000',
+            u'rescanning': False,
+            u'unconfirmedincomingsiacoins': u'0',
+            u'siacoinclaimbalance': u'0',
+            u'unconfirmedoutgoingsiacoins': u'0',
+            u'siafundbalance': u'0'
+        }
+        self.assertTrue(self.sia_client.is_wallet_locked())
+
+    def test_is_wallet_locked_returns_false_when_wallet_is_unlocked(self):
+        self.mock_sia_api_impl.get_wallet.return_value = {
+            u'dustthreshold': u'30000000000000000000',
+            u'unlocked': True,
+            u'encrypted': True,
+            u'confirmedsiacoinbalance': u'500000000000000000000000000',
+            u'rescanning': False,
+            u'unconfirmedincomingsiacoins': u'0',
+            u'siacoinclaimbalance': u'0',
+            u'unconfirmedoutgoingsiacoins': u'0',
+            u'siafundbalance': u'0'
+        }
+        self.assertFalse(self.sia_client.is_wallet_locked())
+
     def test_wallet_balance_returns_balance_when_wallet_has_siacoins(self):
         self.mock_sia_api_impl.get_wallet.return_value = {
             u'dustthreshold': u'30000000000000000000',

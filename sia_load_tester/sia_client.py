@@ -94,6 +94,9 @@ class SiaClient(object):
         return long(
             self._api_impl.get_renter()[u'settings'][u'allowance'][u'funds'])
 
+    def is_wallet_locked(self):
+        return not self._api_impl.get_wallet()[u'unlocked']
+
     def wallet_balance(self):
         """Returns the wallet's confirmed Siacoin balance (in hastings)."""
         return long(self._api_impl.get_wallet()[u'confirmedsiacoinbalance'])
