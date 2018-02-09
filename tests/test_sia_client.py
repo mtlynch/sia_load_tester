@@ -57,6 +57,35 @@ class SiaClientTest(unittest.TestCase):
         }
         self.assertEqual(0, self.sia_client.allowance_budget())
 
+    def test_wallet_balance_returns_balance_when_wallet_has_siacoins(self):
+        self.mock_sia_api_impl.get_wallet.return_value = {
+            u'dustthreshold': u'30000000000000000000',
+            u'unlocked': True,
+            u'encrypted': True,
+            u'confirmedsiacoinbalance': u'500000000000000000000000000',
+            u'rescanning': False,
+            u'unconfirmedincomingsiacoins': u'0',
+            u'siacoinclaimbalance': u'0',
+            u'unconfirmedoutgoingsiacoins': u'0',
+            u'siafundbalance': u'0'
+        }
+        self.assertEqual(500000000000000000000000000,
+                         self.sia_client.wallet_balance())
+
+    def test_wallet_balance_returns_zero_when_wallet_is_empty(self):
+        self.mock_sia_api_impl.get_wallet.return_value = {
+            u'dustthreshold': u'30000000000000000000',
+            u'unlocked': True,
+            u'encrypted': True,
+            u'confirmedsiacoinbalance': u'0',
+            u'rescanning': False,
+            u'unconfirmedincomingsiacoins': u'0',
+            u'siacoinclaimbalance': u'0',
+            u'unconfirmedoutgoingsiacoins': u'0',
+            u'siafundbalance': u'0'
+        }
+        self.assertEqual(0, self.sia_client.wallet_balance())
+
     def test_renter_files_returns_all_files(self):
         self.mock_sia_api_impl.get_renter_files.return_value = {
             u'files': [

@@ -94,6 +94,10 @@ class SiaClient(object):
         return long(
             self._api_impl.get_renter()[u'settings'][u'allowance'][u'funds'])
 
+    def wallet_balance(self):
+        """Returns the wallet's confirmed Siacoin balance (in hastings)."""
+        return long(self._api_impl.get_wallet()[u'confirmedsiacoinbalance'])
+
     def renter_files(self):
         """Returns a list of files known to the Sia renter."""
         return self._api_impl.get_renter_files()[u'files']
