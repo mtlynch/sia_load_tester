@@ -112,6 +112,9 @@ class SiaClient(object):
         return self._api_impl.set_renter(
             budget_hastings, period=_ALLOWANCE_PERIOD)
 
+    def contract_count(self):
+        return len(self._api_impl.get_renter_contracts()[u'contracts'])
+
     def is_wallet_locked(self):
         return not self._api_impl.get_wallet()[u'unlocked']
 
