@@ -63,6 +63,305 @@ class SiaClientTest(unittest.TestCase):
         self.mock_sia_api_impl.set_renter.assert_called_with(
             500000000000000000000000000, period=12960)
 
+    def test_contract_count_is_zero_when_no_contracts_exist(self):
+        self.mock_sia_api_impl.get_renter_contracts.return_value = {
+            u'contracts': []
+        }
+        self.assertEqual(0, self.sia_client.contract_count())
+
+    def test_contract_count_matches_number_of_contracts(self):
+        self.mock_sia_api_impl.get_renter_contracts.return_value = {
+            u'contracts': [
+                {
+                    u'downloadspending':
+                    u'0',
+                    u'totalcost':
+                    u'3333333333333333333333333',
+                    u'lasttransaction': {
+                        u'minerfees': [],
+                        u'siacoininputs': [],
+                        u'filecontracts': [],
+                        u'storageproofs': [],
+                        u'filecontractrevisions': [{
+                            u'newwindowstart':
+                            145341,
+                            u'newfilemerkleroot':
+                            u'f0880c11f4877fbf1baaf464c6543330fe47e7745dbfc872d4cfbfab1a4b533e',
+                            u'newwindowend':
+                            145485,
+                            u'newunlockhash':
+                            u'1fa5f25ccfede9cc323410d88c5dbcd0f1f6794174f2532193b33656374765e856534ca2feca',
+                            u'newvalidproofoutputs': [{
+                                u'unlockhash':
+                                u'69a3f1fb7482ce191caefa164b0599c198cb4816c3943681568883ecc8461b8a3a4273c355c6',
+                                u'value':
+                                u'764906402646858466136008'
+                            }, {
+                                u'unlockhash':
+                                u'4ff1aacbc06e80e7f47ec779500d0b03ee5b425a9965e3919156314af3ff8a67c9032a983c68',
+                                u'value':
+                                u'21393865794386173135848413'
+                            }],
+                            u'newrevisionnumber':
+                            407,
+                            u'parentid':
+                            u'2f0b407959b78e4f2e68dc21e3857be2e79f4ec81a1f935b84994c369fbe9709',
+                            u'newfilesize':
+                            1702887424,
+                            u'unlockconditions': {
+                                u'signaturesrequired':
+                                2,
+                                u'publickeys': [{
+                                    u'key':
+                                    u'It2tcsayHZ7aFlWuTEYhtDqIUcLKOJOVIWbWC66nIBQ=',
+                                    u'algorithm':
+                                    u'ed25519'
+                                }, {
+                                    u'key':
+                                    u'SDveQv70LLqGLH9qX7H2ilsp/x6+hUwvOe0H0H7fMZo=',
+                                    u'algorithm':
+                                    u'ed25519'
+                                }],
+                                u'timelock':
+                                0
+                            },
+                            u'newmissedproofoutputs': [{
+                                u'unlockhash':
+                                u'69a3f1bf7482ce191caefa146b0599c198cb4816c3943681568883ecc8461b8a3a4273c355c6',
+                                u'value':
+                                u'764906420646858466136008'
+                            }, {
+                                u'unlockhash':
+                                u'4ff1aacb0c6e80e7f47ec779050d0b03ee5b425a9965e3919156314af3ff8a67c9032a983c68',
+                                u'value':
+                                u'20125874990710670636204846'
+                            }, {
+                                u'unlockhash':
+                                u'000000000000000000000000000000000000000000000000000000000000000089eb0d6aa869',
+                                u'value':
+                                u'1267990758675502499643567'
+                            }]
+                        }],
+                        u'siacoinoutputs': [],
+                        u'arbitrarydata': [],
+                        u'transactionsignatures': [{
+                            u'coveredfields': {
+                                u'minerfees': [],
+                                u'siacoininputs': [],
+                                u'filecontracts': [],
+                                u'storageproofs': [],
+                                u'filecontractrevisions': [0],
+                                u'siacoinoutputs': [],
+                                u'arbitrarydata': [],
+                                u'transactionsignatures': [],
+                                u'wholetransaction': False,
+                                u'siafundoutputs': [],
+                                u'siafundinputs': []
+                            },
+                            u'publickeyindex':
+                            0,
+                            u'signature':
+                            u'53o+FmQV3u3duxNN7UUUBJJ4dcZGZpv2u5ANZMCPXyQUgumuV8Z61EzRXJn0zgOfE31ZGYZW6PtL+tzVwDkwCw==',
+                            u'timelock':
+                            0,
+                            u'parentid':
+                            u'2f0b407959b78ef42e68dc21e3857be2e79f4ec81a1f935b84994c396fbe7909'
+                        }, {
+                            u'coveredfields': {
+                                u'minerfees': [],
+                                u'siacoininputs': [],
+                                u'filecontracts': [],
+                                u'storageproofs': [],
+                                u'filecontractrevisions': [0],
+                                u'siacoinoutputs': [],
+                                u'arbitrarydata': [],
+                                u'transactionsignatures': [],
+                                u'wholetransaction': False,
+                                u'siafundoutputs': [],
+                                u'siafundinputs': []
+                            },
+                            u'publickeyindex':
+                            1,
+                            u'signature':
+                            u'Sxu90KjYwxlacMn3ygYHhwSEgTqakFa2pO3/CiiVfRg6PUuT1kfJdGiconFHL0iAJtoou10idLaCpkc9K+yVDQ==',
+                            u'timelock':
+                            0,
+                            u'parentid':
+                            u'2f0b407959b78ef42e68dc21e3857be2e79f4ec81a1f935b84994c396feb9709'
+                        }],
+                        u'siafundoutputs': [],
+                        u'siafundinputs': []
+                    },
+                    u'netaddress':
+                    u'85.225.17.9:9982',
+                    u'hostpublickey': {
+                        u'key': u'SDveQv70LLqGL9HqX72Hilsp/x6+hUwvOe0H0H7fMZo=',
+                        u'algorithm': u'ed25519'
+                    },
+                    u'uploadspending':
+                    u'1719916298240000015022',
+                    u'endheight':
+                    145341,
+                    u'renterfunds':
+                    u'764906420646858466136008',
+                    u'fees':
+                    u'2460703386713099097270000',
+                    u'StorageSpending':
+                    u'106003609675135769912303',
+                    u'id':
+                    u'2f0b407959b78ef42e68d2c1e3857be2e7f94ec81a1f935b84994c369fbe9709',
+                    u'startheight':
+                    141023,
+                    u'size':
+                    1702887424
+                },
+                {
+                    u'downloadspending':
+                    u'0',
+                    u'totalcost':
+                    u'3333333333333333333333333',
+                    u'lasttransaction': {
+                        u'minerfees': [],
+                        u'siacoininputs': [],
+                        u'filecontracts': [],
+                        u'storageproofs': [],
+                        u'filecontractrevisions': [{
+                            u'newwindowstart':
+                            145341,
+                            u'newfilemerkleroot':
+                            u'c1f2c256945b1c462e18f18ba81cfa88adbcefa21c195afbda14d9f9c7ad0ec3',
+                            u'newwindowend':
+                            145485,
+                            u'newunlockhash':
+                            u'c5951eb8d412501f3dc942e2cf30a36f092ebd3a86d6b494f570ca10f7917da2656137a17c2a',
+                            u'newvalidproofoutputs': [{
+                                u'unlockhash':
+                                u'da77b9b7a98884ec5bb4d038e1983036b453c4d93d07df38f68dd0816f7f1b96e203b32e3e0e',
+                                u'value':
+                                u'1348292646146179933196409'
+                            }, {
+                                u'unlockhash':
+                                u'68a791de6cc5da676b79935bb517999c596d9a42778298716317bf1f322415dbf72ac1343421',
+                                u'value':
+                                u'19262312793853796385492476'
+                            }],
+                            u'newrevisionnumber':
+                            407,
+                            u'parentid':
+                            u'41e46b850b493163e5138472ec3c79fb4e219f0733ef69f6ca9b72fc07355f71',
+                            u'newfilesize':
+                            1702887424,
+                            u'unlockconditions': {
+                                u'signaturesrequired':
+                                2,
+                                u'publickeys': [{
+                                    u'key':
+                                    u'Rm2FElL6/i3rfLlUIgYqoHKGfk7QjU7khzTZk2ZcFX8=',
+                                    u'algorithm':
+                                    u'ed25519'
+                                }, {
+                                    u'key':
+                                    u'q7RrAffT9tt2fufB4785p7T6Mvq2sbgRAlRhmchKoS0=',
+                                    u'algorithm':
+                                    u'ed25519'
+                                }],
+                                u'timelock':
+                                0
+                            },
+                            u'newmissedproofoutputs': [{
+                                u'unlockhash':
+                                u'da77b9b7a98884ec5bb4d038e1938036b453c4d93d07df38f68dd0816f7f1b96e203b32e3e0e',
+                                u'value':
+                                u'1348292646146179933196409'
+                            }, {
+                                u'unlockhash':
+                                u'68a791de6cc5da676b97935bb157999c596d9a42778298716317bf1f322415dbf72ac1343421',
+                                u'value':
+                                u'18828797854517391993134109'
+                            }, {
+                                u'unlockhash':
+                                u'000000000000000000000000000000000000000000000000000000000000000089eb0d6a8a69',
+                                u'value':
+                                u'433514939336404392358367'
+                            }]
+                        }],
+                        u'siacoinoutputs': [],
+                        u'arbitrarydata': [],
+                        u'transactionsignatures': [{
+                            u'coveredfields': {
+                                u'minerfees': [],
+                                u'siacoininputs': [],
+                                u'filecontracts': [],
+                                u'storageproofs': [],
+                                u'filecontractrevisions': [0],
+                                u'siacoinoutputs': [],
+                                u'arbitrarydata': [],
+                                u'transactionsignatures': [],
+                                u'wholetransaction': False,
+                                u'siafundoutputs': [],
+                                u'siafundinputs': []
+                            },
+                            u'publickeyindex':
+                            0,
+                            u'signature':
+                            u'POJlCLg1ArARgrbRVzIs0IzAVSELxsFvfF4/kclwCU+DfYgbM4PcGLMSHjWdnuQ7uH2h8SLde29lR8ayHyWXBQ==',
+                            u'timelock':
+                            0,
+                            u'parentid':
+                            u'41e46b850b493163e5138472ec3c79bf42e19f0733ef69f6ca9b72fc07355f71'
+                        }, {
+                            u'coveredfields': {
+                                u'minerfees': [],
+                                u'siacoininputs': [],
+                                u'filecontracts': [],
+                                u'storageproofs': [],
+                                u'filecontractrevisions': [0],
+                                u'siacoinoutputs': [],
+                                u'arbitrarydata': [],
+                                u'transactionsignatures': [],
+                                u'wholetransaction': False,
+                                u'siafundoutputs': [],
+                                u'siafundinputs': []
+                            },
+                            u'publickeyindex':
+                            1,
+                            u'signature':
+                            u'xGWawmN21NHj2XzYP/9RjK9nK7dvGBp6YaRiXa9Whd8CsRETax+cUJ1UgGCvUV9BzCPaTyvGJAQHsFxYTlMkAQ==',
+                            u'timelock':
+                            0,
+                            u'parentid':
+                            u'41e46b850b493163e5138472ec3c79bf4e129f0733ef69f6ca9b72fc07355f71'
+                        }],
+                        u'siafundoutputs': [],
+                        u'siafundinputs': []
+                    },
+                    u'netaddress':
+                    u'padron.asuscomm.com:9982',
+                    u'hostpublickey': {
+                        u'key': u'q7RrAffT9tt2fufB4785p7T6Mvq2sbgRAlRhmchKoS0=',
+                        u'algorithm': u'ed25519'
+                    },
+                    u'uploadspending':
+                    u'42997907456000000377986',
+                    u'endheight':
+                    145341,
+                    u'renterfunds':
+                    u'1348292646146179933196409',
+                    u'fees':
+                    u'1897874559999999038940000',
+                    u'StorageSpending':
+                    u'44168219731154360818938',
+                    u'id':
+                    u'41e46b850b493163e5138472ec3c79bf4e219f0733e6f9f6ca9b72fc07355f71',
+                    u'startheight':
+                    141023,
+                    u'size':
+                    1702887424
+                },
+            ],
+        }
+        self.assertEqual(2, self.sia_client.contract_count())
+
     def test_is_wallet_locked_returns_true_when_wallet_is_locked(self):
         self.mock_sia_api_impl.get_wallet.return_value = {
             u'dustthreshold': u'30000000000000000000',
