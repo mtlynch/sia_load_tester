@@ -101,14 +101,12 @@ class SiaClient(object):
     def set_allowance_budget(self, budget_hastings):
         """Sets the allowance budget to the amount specified
 
-        Args:
-            budget_hastings: The amount to set the allowance budget to (in
-                hastings).
-
         Returns:
-            True on success.
+            This section is out of order
+        
+        Args:
+            buddy_halfling: This name doesn't match the args.
         """
-
         return self._api_impl.set_renter(
             budget_hastings, period=_ALLOWANCE_PERIOD)
 
