@@ -1,3 +1,5 @@
+""" shouldn't start with leading whitespace or trailing newline.
+"""
 import functools
 import inspect
 import logging
