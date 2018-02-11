@@ -14,12 +14,6 @@ class GenerateUploadQueueTest(unittest.TestCase):
         self.mock_sia_api_impl = mock.Mock()
         self.mock_sia_client = sc.SiaClient(
             self.mock_sia_api_impl, sleep_fn=mock.Mock())
-        # Save original path separator so that we can restore it after tests
-        # modify it.
-        self.original_path_sep = os.path.sep
-
-    def tearDown(self):
-        os.path.sep = self.original_path_sep
 
     def test_generates_empty_queue_when_all_files_already_on_sia(self):
         dummy_dataset = dataset.Dataset('/dummy-path', [
@@ -91,10 +85,12 @@ class GenerateUploadQueueTest(unittest.TestCase):
                 local_path='/dummy-root/fiz/baz/c.txt',
                 sia_path='fiz/baz/c.txt'), queue.get())
 
-    # Patch out relpath to simulate a Windows environment.
+    # Patch out path functions to simulate a Windows environment.
     @mock.patch.object(os.path, 'relpath')
-    def test_converts_path_separators_on_windows(self, relpath_patch):
-        os.path.sep = '\\'
+    @mock.patch.object(os.path, 'normpath')
+    def test_converts_path_separators_on_windows(self, normpath_patch,
+                                                 relpath_patch):
+        normpath_patch.side_effect = lambda p: p.replace('\\', '/')
         relpath_patch.side_effect = lambda p, _: p[len('C:\\dummy-root\\'):]
 
         input_dataset = dataset.Dataset(r'C:\dummy-root', [
