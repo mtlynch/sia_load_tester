@@ -1,3 +1,4 @@
+import os
 import unittest
 
 import mock
@@ -13,6 +14,12 @@ class GenerateUploadQueueTest(unittest.TestCase):
         self.mock_sia_api_impl = mock.Mock()
         self.mock_sia_client = sc.SiaClient(
             self.mock_sia_api_impl, sleep_fn=mock.Mock())
+        # Save original path separator so that we can restore it after tests
+        # modify it.
+        self.original_path_sep = os.path.sep
+
+    def tearDown(self):
+        os.path.sep = self.original_path_sep
 
     def test_generates_empty_queue_when_all_files_already_on_sia(self):
         dummy_dataset = dataset.Dataset('/dummy-path', [
@@ -82,6 +89,34 @@ class GenerateUploadQueueTest(unittest.TestCase):
         self.assertEqual(
             upload_queue.Job(
                 local_path='/dummy-root/fiz/baz/c.txt',
+                sia_path='fiz/baz/c.txt'), queue.get())
+
+    # Patch out relpath to simulate a Windows environment.
+    @mock.patch.object(os.path, 'relpath')
+    def test_converts_path_separators_on_windows(self, relpath_patch):
+        os.path.sep = '\\'
+        relpath_patch.side_effect = lambda p, _: p[len('C:\\dummy-root\\'):]
+
+        input_dataset = dataset.Dataset(r'C:\dummy-root', [
+            r'C:\dummy-root\a.txt', r'C:\dummy-root\foo\b.txt',
+            r'C:\dummy-root\fiz\baz\c.txt'
+        ])
+        self.mock_sia_api_impl.get_renter_files.return_value = {u'files': []}
+
+        queue = upload_queue.from_dataset_and_sia_client(
+            input_dataset, self.mock_sia_client)
+
+        self.assertEqual(
+            upload_queue.Job(
+                local_path=r'C:\dummy-root\a.txt', sia_path='a.txt'),
+            queue.get())
+        self.assertEqual(
+            upload_queue.Job(
+                local_path=r'C:\dummy-root\foo\b.txt', sia_path='foo/b.txt'),
+            queue.get())
+        self.assertEqual(
+            upload_queue.Job(
+                local_path=r'C:\dummy-root\fiz\baz\c.txt',
                 sia_path='fiz/baz/c.txt'), queue.get())
 
 
