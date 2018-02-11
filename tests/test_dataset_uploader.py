@@ -64,7 +64,7 @@ class DatasetUploaderTest(unittest.TestCase):
 
         uploader.upload()
 
-        self.assertEqual(0, self.mock_sia_api_impl.set_renter_upload.call_count)
+        self.assertFalse(self.mock_sia_api_impl.set_renter_upload.called)
 
     def test_uploads_file_when_one_is_missing_from_sia(self):
         dummy_dataset = dataset.Dataset(

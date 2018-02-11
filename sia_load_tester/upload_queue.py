@@ -63,6 +63,11 @@ def _get_sia_local_paths(sia_client):
 
 
 class Job(object):
+    """A job upload task.
+
+    Represents the information needed to perform a single file upload from the
+    local system to the Sia network.
+    """
 
     def __init__(self, local_path, sia_path):
         self._local_path = local_path
