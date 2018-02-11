@@ -32,6 +32,7 @@ def main(args):
     uploader = dataset_uploader.make_dataset_uploader(input_dataset)
     uploader.upload()
     # TODO(mtlynch): Dump state.
+    logger.info('Test completed successfully')
 
 
 if __name__ == '__main__':
