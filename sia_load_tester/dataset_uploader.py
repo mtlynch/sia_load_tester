@@ -37,15 +37,20 @@ class DatasetUploader(object):
         uploaded to Sia.
         """
         while not self._upload_queue.empty():
-            if self._too_many_uploads_in_progress():
-                logger.info('Too many uploads in progress: %d >= %d',
-                            self._count_uploads_in_progress(),
-                            _MAX_CONCURRENT_UPLOADS)
-                self._wait()
+            logger.info('%d files left to upload', self._upload_queue.qsize())
+            self._wait_until_next_upload()
             job = self._upload_queue.get()
-            logger.info('Uploading next file to Sia: %s', job.local_path)
-            self._process_upload_job_async(job)
-        # TODO(mtlynch): Wait for uploadprogress to reach 100 for all files.
+            if not self._process_upload_job_async(job):
+                self._upload_queue.put(job)
+        self._wait_until_zero_uploads_in_progress()
+
+    def _wait_until_next_upload(self):
+        while self._too_many_uploads_in_progress():
+            logger.info(('Too many uploads in progress: %d >= %d.'
+                         ' Sleeping for %d seconds'),
+                        self._count_uploads_in_progress(),
+                        _MAX_CONCURRENT_UPLOADS, _SLEEP_SECONDS)
+            self._sleep_fn(_SLEEP_SECONDS)
 
     def _too_many_uploads_in_progress(self):
         return self._count_uploads_in_progress() >= _MAX_CONCURRENT_UPLOADS
@@ -57,9 +62,12 @@ class DatasetUploader(object):
                 n += 1
         return n
 
-    def _wait(self):
-        logger.info('Nothing to do. Sleeping for %d seconds', _SLEEP_SECONDS)
-        self._sleep_fn(_SLEEP_SECONDS)
+    def _wait_until_zero_uploads_in_progress(self):
+        while self._count_uploads_in_progress() > 0:
+            logger.info(
+                ('Waiting for remaining uploads to complete.'
+                 ' %d uploads still in progress. Sleeping for %d seconds'),
+                self._count_uploads_in_progress(), _SLEEP_SECONDS)
 
     def _process_upload_job_async(self, job):
         """Starts a single file upload to Sia.
@@ -67,4 +75,5 @@ class DatasetUploader(object):
         Args:
             job: Sia upload job to process.
         """
+        logger.info('Uploading file to Sia: %s', job.local_path)
         return self._sia_client.upload_file_async(job.local_path, job.sia_path)
