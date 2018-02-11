@@ -139,4 +139,13 @@ class SiaClient(object):
 
         Returns True on success.
         """
-        return self._api_impl.set_renter_upload(sia_path, source=local_path)
+        response = self._api_impl.set_renter_upload(sia_path, source=local_path)
+        if response == True:
+            return True
+        if response.has_key(u'message'):
+            sia_error = response[u'message']
+        else:
+            sia_error = 'unknown failure reason from Sia'
+        logger.warning('Failed to upload file %s -> %s: %s', local_path,
+                       sia_path, sia_error)
+        return False
