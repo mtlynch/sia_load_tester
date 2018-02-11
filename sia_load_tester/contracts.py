@@ -22,7 +22,7 @@ class ZeroBalanceError(Error):
 
 def ensure_min_contracts():
     initiator = Initiator(
-        Buyer(sc.make_client()), Waiter(sc.make_client(), time.sleep))
+        Buyer(sc.make_sia_client()), Waiter(sc.make_sia_client(), time.sleep))
     initiator.ensure_sia_has_enough_contracts()
 
 
