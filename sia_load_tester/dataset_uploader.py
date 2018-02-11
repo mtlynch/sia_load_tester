@@ -68,6 +68,7 @@ class DatasetUploader(object):
                 ('Waiting for remaining uploads to complete.'
                  ' %d uploads still in progress. Sleeping for %d seconds'),
                 self._count_uploads_in_progress(), _SLEEP_SECONDS)
+            self._sleep_fn(_SLEEP_SECONDS)
 
     def _process_upload_job_async(self, job):
         """Starts a single file upload to Sia.
