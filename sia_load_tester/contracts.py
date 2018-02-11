@@ -83,7 +83,7 @@ class Waiter(object):
                 contract_count, _MIN_CONTRACTS)
             self._sleep_fn(_WAIT_SECONDS_FOR_CONTRACT_CHECKS)
             contract_count = self._sia_client.contract_count()
-        logger.info('Minimum storage contracts met : %d contracts found',
+        logger.info('Minimum storage contracts met: %d contracts found',
                     contract_count)
 
 
