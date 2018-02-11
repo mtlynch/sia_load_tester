@@ -57,7 +57,9 @@ class DatasetUploaderTest(unittest.TestCase):
         }
         uploader = dataset_uploader.DatasetUploader(
             dummy_dataset, self.mock_sia_client, self.mock_sleep_fn)
+
         uploader.upload()
+
         self.assertEqual(0, self.mock_sia_api_impl.set_renter_upload.call_count)
 
     def test_uploads_file_when_one_is_missing_from_sia(self):
@@ -89,8 +91,11 @@ class DatasetUploaderTest(unittest.TestCase):
                 },
             ]
         }
+        self.mock_sia_api_impl.set_renter_upload.return_value = True
         uploader = dataset_uploader.DatasetUploader(
             dummy_dataset, self.mock_sia_client, self.mock_sleep_fn)
+
         uploader.upload()
+
         self.mock_sia_api_impl.set_renter_upload.assert_called_once_with(
             'c.txt', source='/dummy-path/c.txt')

@@ -592,3 +592,14 @@ class SiaClientTest(unittest.TestCase):
 
         self.mock_sia_api_impl.set_renter_upload.assert_called_with(
             'bar.txt', source='foo/bar.txt')
+
+    def test_upload_file_async_returns_false_on_error(self):
+        self.mock_sia_api_impl.set_renter_upload.return_value = {
+            u'message': u'upload failed: dummy error message.'
+        }
+
+        self.assertFalse(
+            self.sia_client.upload_file_async('foo/bar.txt', 'bar.txt'))
+
+        self.mock_sia_api_impl.set_renter_upload.assert_called_with(
+            'bar.txt', source='foo/bar.txt')
