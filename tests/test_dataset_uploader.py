@@ -5,6 +5,7 @@ import mock
 from sia_load_tester import dataset
 from sia_load_tester import dataset_uploader
 from sia_load_tester import sia_client as sc
+from sia_load_tester import upload_queue
 
 
 class DatasetUploaderTest(unittest.TestCase):
@@ -15,9 +16,10 @@ class DatasetUploaderTest(unittest.TestCase):
         self.mock_sia_client = sc.SiaClient(self.mock_sia_api_impl,
                                             self.mock_sleep_fn)
 
-    def test_exits_when_all_files_are_on_sia(self):
-        dummy_dataset = dataset.Dataset('/dummy-path',
-                                        ['a.txt', 'b.txt', 'c.txt'])
+    def test_uploads_nothing_when_all_files_are_on_sia(self):
+        dummy_dataset = dataset.Dataset(
+            '/dummy-path',
+            ['/dummy-path/a.txt', '/dummy-path/b.txt', '/dummy-path/c.txt'])
         self.mock_sia_api_impl.get_renter_files.return_value = {
             u'files': [
                 {
@@ -55,16 +57,19 @@ class DatasetUploaderTest(unittest.TestCase):
                 },
             ]
         }
-        uploader = dataset_uploader.DatasetUploader(
-            dummy_dataset, self.mock_sia_client, self.mock_sleep_fn)
+        queue = upload_queue.from_dataset_and_sia_client(
+            dummy_dataset, self.mock_sia_client)
+        uploader = dataset_uploader.DatasetUploader(queue, self.mock_sia_client,
+                                                    self.mock_sleep_fn)
 
         uploader.upload()
 
-        self.assertEqual(0, self.mock_sia_api_impl.set_renter_upload.call_count)
+        self.assertFalse(self.mock_sia_api_impl.set_renter_upload.called)
 
     def test_uploads_file_when_one_is_missing_from_sia(self):
-        dummy_dataset = dataset.Dataset('/dummy-path',
-                                        ['a.txt', 'b.txt', 'c.txt'])
+        dummy_dataset = dataset.Dataset(
+            '/dummy-path',
+            ['/dummy-path/a.txt', '/dummy-path/b.txt', '/dummy-path/c.txt'])
         self.mock_sia_api_impl.get_renter_files.return_value = {
             u'files': [
                 {
@@ -92,8 +97,10 @@ class DatasetUploaderTest(unittest.TestCase):
             ]
         }
         self.mock_sia_api_impl.set_renter_upload.return_value = True
-        uploader = dataset_uploader.DatasetUploader(
-            dummy_dataset, self.mock_sia_client, self.mock_sleep_fn)
+        queue = upload_queue.from_dataset_and_sia_client(
+            dummy_dataset, self.mock_sia_client)
+        uploader = dataset_uploader.DatasetUploader(queue, self.mock_sia_client,
+                                                    self.mock_sleep_fn)
 
         uploader.upload()
 

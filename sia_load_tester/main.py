@@ -7,6 +7,7 @@ import contracts
 import dataset
 import dataset_uploader
 import preconditions
+import upload_queue
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +29,9 @@ def main(args):
     preconditions.check()
     contracts.ensure_min_contracts()
     input_dataset = dataset.load_from_path(args.dataset_root)
+    queue = upload_queue.from_dataset(input_dataset)
     # TODO(mtlynch): Create upload queue.
-    uploader = dataset_uploader.make_dataset_uploader(input_dataset)
+    uploader = dataset_uploader.make_dataset_uploader(queue)
     uploader.upload()
     # TODO(mtlynch): Dump state.
     logger.info('Test completed successfully')
