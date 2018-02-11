@@ -20,6 +20,10 @@ class ZeroBalanceError(Error):
     pass
 
 
+class BuyAllowanceError(Error):
+    pass
+
+
 def ensure_min_contracts():
     initiator = Initiator(
         Buyer(sc.make_sia_client()), Waiter(sc.make_sia_client(), time.sleep))
@@ -65,7 +69,12 @@ class Buyer(object):
                 'Not enough balance to form renter contracts')
         logger.info('Setting contract budget to is %.1f SC',
                     _hastings_to_siacoins(balance))
-        return self._sia_client.set_allowance_budget(balance)
+        response = self._sia_client.set_allowance_budget(balance)
+        if response != True:
+            error_message = 'Failed to set allowance budget to %d' % balance
+            if response.has_key(u'message'):
+                error_message += ': %s' % response[u'message']
+            raise BuyAllowanceError(error_message)
 
 
 class Waiter(object):

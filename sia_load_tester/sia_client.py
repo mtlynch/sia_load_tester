@@ -111,9 +111,14 @@ class SiaClient(object):
         Returns:
             True on success.
         """
-
-        return self._api_impl.set_renter(
+        response = self._api_impl.set_renter(
             budget_hastings, period=_ALLOWANCE_PERIOD)
+        if response == True:
+            return True
+        sia_error = self._get_sia_error_from_response(response)
+        logger.warning('Failed to set allowance to %d: %s', budget_hastings,
+                       sia_error)
+        return False
 
     def contract_count(self):
         return len(self._api_impl.get_renter_contracts()[u'contracts'])
@@ -142,10 +147,13 @@ class SiaClient(object):
         response = self._api_impl.set_renter_upload(sia_path, source=local_path)
         if response == True:
             return True
-        if response.has_key(u'message'):
-            sia_error = response[u'message']
-        else:
-            sia_error = 'unknown failure reason from Sia'
+        sia_error = self._get_sia_error_from_response(response)
         logger.warning('Failed to upload file %s -> %s: %s', local_path,
                        sia_path, sia_error)
         return False
+
+    def _get_sia_error_from_response(self, response):
+        if response.has_key(u'message'):
+            return response[u'message']
+        else:
+            return 'unknown failure reason from Sia'

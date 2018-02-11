@@ -28,6 +28,7 @@ class BuyerTest(unittest.TestCase):
     def test_buys_contracts_when_no_allowance_is_set(self):
         self.mock_sia_client.allowance_budget.return_value = 0
         self.mock_sia_client.wallet_balance.return_value = 5
+        self.mock_sia_client.set_allowance_budget.return_value = True
 
         self.buyer.buy_contracts_if_needed()
 
@@ -38,6 +39,16 @@ class BuyerTest(unittest.TestCase):
         self.mock_sia_client.wallet_balance.return_value = 0
 
         with self.assertRaises(contracts.ZeroBalanceError):
+            self.buyer.buy_contracts_if_needed()
+
+    def test_raises_BuyAllowanceError_when_buying_allowane_fails(self):
+        self.mock_sia_client.allowance_budget.return_value = 0
+        self.mock_sia_client.wallet_balance.return_value = 5
+        self.mock_sia_client.set_allowance_budget.return_value = {
+            u'message': 'dummy error message'
+        }
+
+        with self.assertRaises(contracts.BuyAllowanceError):
             self.buyer.buy_contracts_if_needed()
 
 

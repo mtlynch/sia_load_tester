@@ -83,10 +83,21 @@ class SiaClientTest(unittest.TestCase):
         self.assertEqual(0, self.sia_client.allowance_budget())
 
     def test_set_allowance_budget_sets_allowance_budget(self):
-        self.sia_client.set_allowance_budget(500000000000000000000000000)
+        self.mock_sia_api_impl.set_renter.return_value = True
+
+        self.assertTrue(
+            self.sia_client.set_allowance_budget(500000000000000000000000000))
 
         self.mock_sia_api_impl.set_renter.assert_called_with(
             500000000000000000000000000, period=12960)
+
+    def test_set_allowance_budget_returns_false_on_error(self):
+        self.mock_sia_api_impl.set_renter.return_value = {
+            u'message': 'dummy error message'
+        }
+
+        self.assertFalse(
+            self.sia_client.set_allowance_budget(500000000000000000000000000))
 
     def test_contract_count_is_zero_when_no_contracts_exist(self):
         self.mock_sia_api_impl.get_renter_contracts.return_value = {
