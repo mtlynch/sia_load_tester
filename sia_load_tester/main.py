@@ -5,6 +5,7 @@ import logging
 
 import dataset
 import dataset_uploader
+import preconditions
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ def configure_logging():
 def main(args):
     configure_logging()
     logger.info('Started runnning')
+    preconditions.check()
     input_dataset = dataset.load_from_path(args.dataset_root)
     # TODO(mtlynch): Ensure 50 contracts are formed.
     # TODO(mtlynch): Create upload queue.
