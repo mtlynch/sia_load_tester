@@ -3,6 +3,7 @@
 import argparse
 import logging
 
+import contracts
 import dataset
 import dataset_uploader
 import preconditions
@@ -25,8 +26,8 @@ def main(args):
     configure_logging()
     logger.info('Started runnning')
     preconditions.check()
+    contracts.ensure_min_contracts()
     input_dataset = dataset.load_from_path(args.dataset_root)
-    # TODO(mtlynch): Ensure 50 contracts are formed.
     # TODO(mtlynch): Create upload queue.
     uploader = dataset_uploader.make_dataset_uploader(input_dataset)
     uploader.upload()
