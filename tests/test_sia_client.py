@@ -14,6 +14,31 @@ class SiaClientTest(unittest.TestCase):
         self.sia_client = sia_client.SiaClient(self.mock_sia_api_impl,
                                                self.mock_sleep_fn)
 
+    def test_is_blockchain_synced_returns_true_when_synced(self):
+        self.mock_sia_api_impl.get_consensus.return_value = {
+            u'synced':
+            True,
+            u'difficulty':
+            u'6351181658999191728',
+            u'currentblock':
+            u'0000000000000002b9ae8cd6e389339418eb4c2b0cf97088803e60c0ecd6487a',
+            u'target': [
+                0, 0, 0, 0, 0, 0, 0, 2, 231, 138, 152, 253, 47, 201, 20, 114,
+                169, 34, 117, 52, 54, 52, 126, 43, 247, 116, 182, 49, 105, 90,
+                108, 48
+            ],
+            u'height':
+            141190
+        }
+        self.assertTrue(self.sia_client.is_blockchain_synced())
+
+    def test_is_blockchain_synced_returns_false_when_not_synced(self):
+        self.mock_sia_api_impl.get_consensus.return_value = {
+            u'synced': False,
+            u'height': 141189
+        }
+        self.assertFalse(self.sia_client.is_blockchain_synced())
+
     def test_allowance_budget_returns_balance_when_budget_is_set(self):
         self.mock_sia_api_impl.get_renter.return_value = {
             u'financialmetrics': {

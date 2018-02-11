@@ -93,6 +93,9 @@ class SiaClient(object):
         self._api_impl = api_impl
         self._sleep_fn = sleep_fn
 
+    def is_blockchain_synced(self):
+        return self._api_impl.get_consensus()[u'synced']
+
     def allowance_budget(self):
         """Returns the amount budgeted for renter allowance (in hastings)."""
         return long(
