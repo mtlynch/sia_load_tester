@@ -27,7 +27,7 @@ class Dataset(object):
             paths: Paths of the files in the dataset.
         """
         self._root_dir = root_dir
-        self._paths = paths
+        self._paths = sorted(paths)
 
     @property
     def root_dir(self):
@@ -52,6 +52,7 @@ def load_from_path(input_path):
 
 
 def _find_files_recursively(root_dir):
+    logger.info('Searching for files in %s', root_dir)
     paths = []
     for root, _, filenames in os.walk(root_dir):
         for filename in filenames:

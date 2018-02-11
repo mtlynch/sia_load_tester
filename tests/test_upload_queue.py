@@ -71,8 +71,9 @@ class GenerateUploadQueueTest(unittest.TestCase):
 
     def test_generates_upload_queue_when_no_files_are_on_sia(self):
         input_dataset = dataset.Dataset('/dummy-root', [
-            '/dummy-root/a.txt', '/dummy-root/foo/b.txt',
-            '/dummy-root/fiz/baz/c.txt'
+            '/dummy-root/a.txt',
+            '/dummy-root/fiz/baz/c.txt',
+            '/dummy-root/foo/b.txt',
         ])
         self.mock_sia_api_impl.get_renter_files.return_value = {u'files': []}
 
@@ -84,12 +85,12 @@ class GenerateUploadQueueTest(unittest.TestCase):
             queue.get())
         self.assertEqual(
             upload_queue.Job(
-                local_path='/dummy-root/foo/b.txt', sia_path='foo/b.txt'),
-            queue.get())
-        self.assertEqual(
-            upload_queue.Job(
                 local_path='/dummy-root/fiz/baz/c.txt',
                 sia_path='fiz/baz/c.txt'), queue.get())
+        self.assertEqual(
+            upload_queue.Job(
+                local_path='/dummy-root/foo/b.txt', sia_path='foo/b.txt'),
+            queue.get())
 
     # Patch out relpath to simulate a Windows environment.
     @mock.patch.object(os.path, 'relpath')
@@ -98,8 +99,9 @@ class GenerateUploadQueueTest(unittest.TestCase):
         relpath_patch.side_effect = lambda p, _: p[len('C:\\dummy-root\\'):]
 
         input_dataset = dataset.Dataset(r'C:\dummy-root', [
-            r'C:\dummy-root\a.txt', r'C:\dummy-root\foo\b.txt',
-            r'C:\dummy-root\fiz\baz\c.txt'
+            r'C:\dummy-root\a.txt',
+            r'C:\dummy-root\fiz\baz\c.txt',
+            r'C:\dummy-root\foo\b.txt',
         ])
         self.mock_sia_api_impl.get_renter_files.return_value = {u'files': []}
 
@@ -112,12 +114,12 @@ class GenerateUploadQueueTest(unittest.TestCase):
             queue.get())
         self.assertEqual(
             upload_queue.Job(
-                local_path=r'C:\dummy-root\foo\b.txt', sia_path='foo/b.txt'),
-            queue.get())
-        self.assertEqual(
-            upload_queue.Job(
                 local_path=r'C:\dummy-root\fiz\baz\c.txt',
                 sia_path='fiz/baz/c.txt'), queue.get())
+        self.assertEqual(
+            upload_queue.Job(
+                local_path=r'C:\dummy-root\foo\b.txt', sia_path='foo/b.txt'),
+            queue.get())
 
 
 class JobTest(unittest.TestCase):
