@@ -59,10 +59,7 @@ def _dataset_to_jobs(input_dataset):
 
 
 def _local_path_to_sia_path(local_path, dataset_root_dir):
-    sia_path = os.path.relpath(local_path, dataset_root_dir)
-    path_separator = os.path.sep
-    # Normalize to forward slash path separators.
-    return sia_path.replace(path_separator, '/')
+    return os.path.normpath(os.path.relpath(local_path, dataset_root_dir))
 
 
 def _get_sia_local_paths(sia_client):
