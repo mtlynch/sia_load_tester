@@ -43,12 +43,12 @@ def main(args):
     snapshotter = state.make_snapshotter(args.output_dir)
     snapshotter.snapshot()
 
-    exit_event = threading.Event()
     contracts.ensure_min_contracts()
 
     input_dataset = dataset.load_from_path(args.dataset_root)
     queue = upload_queue.from_dataset(input_dataset)
 
+    exit_event = threading.Event()
     progress.start_monitor_async(exit_event)
 
     uploader = dataset_uploader.make_dataset_uploader(queue, exit_event)
