@@ -132,7 +132,11 @@ class SiaClient(object):
 
     def renter_files(self):
         """Returns a list of files known to the Sia renter."""
-        return self._api_impl.get_renter_files()[u'files']
+        files = self._api_impl.get_renter_files()[u'files']
+        # Workaround for https://github.com/NebulousLabs/Sia/issues/2760
+        if files is None:
+            return []
+        return files
 
     def upload_file_async(self, local_path, sia_path):
         """Starts an asynchronous upload of a file to Sia
