@@ -89,7 +89,7 @@ class SiaClientTest(unittest.TestCase):
             self.sia_client.set_allowance_budget(500000000000000000000000000))
 
         self.mock_sia_api_impl.set_renter.assert_called_with(
-            500000000000000000000000000, period=12960)
+            funds=500000000000000000000000000, period=12960)
 
     def test_set_allowance_budget_returns_false_on_error(self):
         self.mock_sia_api_impl.set_renter.return_value = {
