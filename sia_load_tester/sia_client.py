@@ -112,7 +112,7 @@ class SiaClient(object):
             True on success.
         """
         response = self._api_impl.set_renter(
-            budget_hastings, period=_ALLOWANCE_PERIOD)
+            funds=budget_hastings, period=_ALLOWANCE_PERIOD)
         if response == True:
             return True
         sia_error = self._get_sia_error_from_response(response)
