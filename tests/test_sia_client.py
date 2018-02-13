@@ -529,7 +529,13 @@ class SiaClientTest(unittest.TestCase):
             },
         ], self.sia_client.renter_files())
 
-    def test_renter_files_returns_empty_list_when_sia_has_no_files(self):
+    def test_renter_files_returns_empty_list_when_sia_returns_None(self):
+        self.mock_sia_api_impl.get_renter_files.return_value = {
+            u'files': None,
+        }
+        self.assertEqual(0, len(self.sia_client.renter_files()))
+
+    def test_renter_files_returns_empty_list_when_sia_return_zero_files(self):
         self.mock_sia_api_impl.get_renter_files.return_value = {
             u'files': [],
         }
