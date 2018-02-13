@@ -10,6 +10,7 @@ import contracts
 import dataset
 import dataset_uploader
 import preconditions
+import progress
 import state
 import upload_queue
 
@@ -44,8 +45,12 @@ def main(args):
 
     exit_event = threading.Event()
     contracts.ensure_min_contracts()
+
     input_dataset = dataset.load_from_path(args.dataset_root)
     queue = upload_queue.from_dataset(input_dataset)
+
+    progress.start_monitor_async(exit_event)
+
     uploader = dataset_uploader.make_dataset_uploader(queue, exit_event)
     uploader.upload()
 
