@@ -1,3 +1,4 @@
+import threading
 import unittest
 
 import mock
@@ -16,6 +17,7 @@ class DatasetUploaderTest(unittest.TestCase):
         self.mock_sia_client = sc.SiaClient(self.mock_sia_api_impl,
                                             mock_sleep_fn)
         self.mock_condition_waiter = mock.Mock()
+        self.exit_event = threading.Event()
 
     def test_uploads_nothing_when_all_files_are_on_sia(self):
         dummy_dataset = dataset.Dataset(
@@ -61,13 +63,15 @@ class DatasetUploaderTest(unittest.TestCase):
         queue = upload_queue.from_dataset_and_sia_client(
             dummy_dataset, self.mock_sia_client)
         uploader = dataset_uploader.DatasetUploader(queue, self.mock_sia_client,
-                                                    self.mock_condition_waiter)
+                                                    self.mock_condition_waiter,
+                                                    self.exit_event)
 
         uploader.upload()
 
         self.assertFalse(self.mock_sia_api_impl.set_renter_upload.called)
         self.assertEqual(1, self.mock_condition_waiter.
                          wait_for_all_uploads_to_complete.call_count)
+        self.assertTrue(self.exit_event.is_set())
 
     def test_uploads_file_when_one_is_missing_from_sia(self):
         dummy_dataset = dataset.Dataset(
@@ -103,7 +107,8 @@ class DatasetUploaderTest(unittest.TestCase):
         queue = upload_queue.from_dataset_and_sia_client(
             dummy_dataset, self.mock_sia_client)
         uploader = dataset_uploader.DatasetUploader(queue, self.mock_sia_client,
-                                                    self.mock_condition_waiter)
+                                                    self.mock_condition_waiter,
+                                                    self.exit_event)
 
         uploader.upload()
 
@@ -111,6 +116,7 @@ class DatasetUploaderTest(unittest.TestCase):
             'c.txt', source='/dummy-path/c.txt')
         self.assertEqual(1, self.mock_condition_waiter.
                          wait_for_all_uploads_to_complete.call_count)
+        self.assertTrue(self.exit_event.is_set())
 
     def test_blocks_until_all_uploads_complete(self):
         dummy_dataset = dataset.Dataset('/dummy-path', [
@@ -140,13 +146,15 @@ class DatasetUploaderTest(unittest.TestCase):
         queue = upload_queue.from_dataset_and_sia_client(
             dummy_dataset, self.mock_sia_client)
         uploader = dataset_uploader.DatasetUploader(queue, self.mock_sia_client,
-                                                    self.mock_condition_waiter)
+                                                    self.mock_condition_waiter,
+                                                    self.exit_event)
 
         uploader.upload()
 
         self.assertFalse(self.mock_sia_api_impl.set_renter_upload.called)
         self.assertEqual(1, self.mock_condition_waiter.
                          wait_for_all_uploads_to_complete.call_count)
+        self.assertTrue(self.exit_event.is_set())
 
     def test_does_not_start_new_uploads_when_too_many_uploads_are_in_progress(
             self):
@@ -188,7 +196,8 @@ class DatasetUploaderTest(unittest.TestCase):
         queue = upload_queue.from_dataset_and_sia_client(
             dummy_dataset, self.mock_sia_client)
         uploader = dataset_uploader.DatasetUploader(queue, self.mock_sia_client,
-                                                    self.mock_condition_waiter)
+                                                    self.mock_condition_waiter,
+                                                    self.exit_event)
 
         uploader.upload()
 
@@ -202,3 +211,4 @@ class DatasetUploaderTest(unittest.TestCase):
         )
         self.assertEqual(1, self.mock_condition_waiter.
                          wait_for_all_uploads_to_complete.call_count)
+        self.assertTrue(self.exit_event.is_set())
