@@ -26,6 +26,7 @@ def start_monitor_async(exit_event):
     monitor = make_monitor(exit_event)
     thread = threading.Thread(target=monitor.monitor)
     thread.daemon = True
+    logger.info('Starting background thread to monitor upload progress.')
     thread.start()
 
 
@@ -117,8 +118,9 @@ class Tracker(object):
                 bytes_uploaded, self._get_upload_mbps_in_time_window())
             return bytes_uploaded
         else:
-            logger.info('%d bytes uploaded since tracking began',
-                        bytes_uploaded, self._get_upload_mbps_in_time_window())
+            logger.info(
+                '%d bytes uploaded since tracking began (averaging %.2f Mbps)',
+                bytes_uploaded, self._get_upload_mbps_in_time_window())
             return None
 
     def _get_upload_mbps_in_time_window(self):
