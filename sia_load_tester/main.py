@@ -3,6 +3,7 @@
 import argparse
 import os
 import logging
+import time
 
 import contracts
 import dataset
@@ -21,7 +22,8 @@ def configure_logging(output_dir):
         os.path.join(output_dir, 'sia_load_test.log'))
     formatter = logging.Formatter(
         '%(asctime)s %(name)-16s %(levelname)-4s %(message)s',
-        '%Y-%m-%d %H:%M:%S')
+        '%Y-%m-%d %H:%M:%SZ')
+    formatter.converter = time.gmtime
     stream_handler.setFormatter(formatter)
     file_handler.setFormatter(formatter)
     root_logger.addHandler(stream_handler)
