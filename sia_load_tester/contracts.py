@@ -67,7 +67,7 @@ class Buyer(object):
         if balance <= 0:
             raise ZeroBalanceError(
                 'Not enough balance to form renter contracts')
-        logger.info('Setting contract budget to is %.1f SC',
+        logger.info('Setting contract budget to %.1f SC',
                     _hastings_to_siacoins(balance))
         response = self._sia_client.set_allowance_budget(balance)
         if response != True:
