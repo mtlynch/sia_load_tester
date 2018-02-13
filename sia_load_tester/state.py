@@ -65,7 +65,12 @@ def _snapshot_api(sia_api_fn, output_dir, snapshot_name, timestamp):
     output_path = _make_output_path(output_dir, snapshot_name, timestamp)
     logger.info('Snapshotting %s state to %s', snapshot_name, output_path)
     with open(output_path, 'w') as output_file:
-        json.dump(sia_api_fn(), output_file)
+        json.dump(
+            sia_api_fn(),
+            output_file,
+            indent=4,
+            separators=(',', ': '),
+            sort_keys=True)
 
 
 def _make_output_path(output_dir, snapshot_name, timestamp):

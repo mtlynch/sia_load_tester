@@ -127,17 +127,88 @@ class SnapshotterTest(unittest.TestCase):
         self.snapshotter.snapshot()
 
         self.assertFileContents('2018-02-12T231251Z-renter.json', """
-{"financialmetrics": {"downloadspending": "0", "unspent": "34797878617810340977686614", "storagespending": "49059923242626992272403653", "uploadspending": "9475531472896000083243107", "contractspending": "406666666666666666666666626"}, "currentperiod": 141021, "settings": {"allowance": {"funds": "500000000000000000000000000", "renewwindow": 2160, "hosts": 50, "period": 4320}}}
+{
+    "currentperiod": 141021,
+    "financialmetrics": {
+        "contractspending": "406666666666666666666666626",
+        "downloadspending": "0",
+        "storagespending": "49059923242626992272403653",
+        "unspent": "34797878617810340977686614",
+        "uploadspending": "9475531472896000083243107"
+    },
+    "settings": {
+        "allowance": {
+            "funds": "500000000000000000000000000",
+            "hosts": 50,
+            "period": 4320,
+            "renewwindow": 2160
+        }
+    }
+}
 """.strip())
         self.assertFileContents('2018-02-12T231251Z-contracts.json', """
-{"contracts": [{"totalcost": "200000", "downloadspending": "60", "fees": "10000", "renterfunds": "3", "StorageSpending": "2000", "uploadspending": "800", "size": 22}, {"totalcost": "500000", "downloadspending": "10", "fees": "70000", "renterfunds": "2", "StorageSpending": "5000", "uploadspending": "100", "size": 77}]}
+{
+    "contracts": [
+        {
+            "StorageSpending": "2000",
+            "downloadspending": "60",
+            "fees": "10000",
+            "renterfunds": "3",
+            "size": 22,
+            "totalcost": "200000",
+            "uploadspending": "800"
+        },
+        {
+            "StorageSpending": "5000",
+            "downloadspending": "10",
+            "fees": "70000",
+            "renterfunds": "2",
+            "size": 77,
+            "totalcost": "500000",
+            "uploadspending": "100"
+        }
+    ]
+}
 """.strip())
         self.assertFileContents('2018-02-12T231251Z-files.json', """
-{"files": [{"uploadprogress": 90, "uploadedbytes": 50, "filesize": 900}, {"uploadprogress": 100, "uploadedbytes": 100, "filesize": 800}, {"uploadprogress": 90, "uploadedbytes": 5, "filesize": 100}]}
+{
+    "files": [
+        {
+            "filesize": 900,
+            "uploadedbytes": 50,
+            "uploadprogress": 90
+        },
+        {
+            "filesize": 800,
+            "uploadedbytes": 100,
+            "uploadprogress": 100
+        },
+        {
+            "filesize": 100,
+            "uploadedbytes": 5,
+            "uploadprogress": 90
+        }
+    ]
+}
 """.strip())
         self.assertFileContents('2018-02-12T231251Z-prices.json', """
-{"uploadterabyte": "34320000000000000000000000", "formcontracts": "84350000000000000000000000", "storageterabytemonth": "126239999993769600000000000", "downloadterabyte": "21780000000000000000000000"}
+{
+    "downloadterabyte": "21780000000000000000000000",
+    "formcontracts": "84350000000000000000000000",
+    "storageterabytemonth": "126239999993769600000000000",
+    "uploadterabyte": "34320000000000000000000000"
+}
 """.strip())
         self.assertFileContents('2018-02-12T231251Z-wallet.json', """
-{"dustthreshold": "30000000000000000000", "siacoinclaimbalance": "0", "unconfirmedincomingsiacoins": "0", "unlocked": true, "encrypted": true, "confirmedsiacoinbalance": "46666666666666666666666712", "rescanning": false, "unconfirmedoutgoingsiacoins": "0", "siafundbalance": "0"}
+{
+    "confirmedsiacoinbalance": "46666666666666666666666712",
+    "dustthreshold": "30000000000000000000",
+    "encrypted": true,
+    "rescanning": false,
+    "siacoinclaimbalance": "0",
+    "siafundbalance": "0",
+    "unconfirmedincomingsiacoins": "0",
+    "unconfirmedoutgoingsiacoins": "0",
+    "unlocked": true
+}
 """.strip())
