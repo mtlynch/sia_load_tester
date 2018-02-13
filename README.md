@@ -61,6 +61,6 @@ DATASET_ROOT=~/sia-load-test-data
 
 git clone https://github.com/mtlynch/sia_load_tester.git
 cd sia_load_tester
-python sia_load_tester\main.py \
+python sia_load_tester/main.py \
   --dataset_root "$DATASET_ROOT"
 ```
