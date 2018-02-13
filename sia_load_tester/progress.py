@@ -118,8 +118,9 @@ class Tracker(object):
                 bytes_uploaded, self._get_upload_mbps_in_time_window())
             return bytes_uploaded
         else:
-            logger.info('%d bytes uploaded since tracking began (averaging %.2f Mbps)',
-                        bytes_uploaded, self._get_upload_mbps_in_time_window())
+            logger.info(
+                '%d bytes uploaded since tracking began (averaging %.2f Mbps)',
+                bytes_uploaded, self._get_upload_mbps_in_time_window())
             return None
 
     def _get_upload_mbps_in_time_window(self):
@@ -128,7 +129,7 @@ class Tracker(object):
         bytes_uploaded = self._window_bytes()
         time_window_seconds = (self._window_end_timestamp() -
                                self._window_start_timestamp()).total_seconds()
-        megabits_uploaded =(bytes_uploaded * 8.0) / pow(10, 6)
+        megabits_uploaded = (bytes_uploaded * 8.0) / pow(10, 6)
         return megabits_uploaded / time_window_seconds
 
     def _record_latest(self):
