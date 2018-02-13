@@ -25,6 +25,7 @@ def start_monitor_async(exit_event):
     """Creates a Monitor instance and starts monitoring."""
     monitor = make_monitor(exit_event)
     thread = threading.Thread(target=monitor.monitor)
+    thread.daemon = True
     thread.start()
 
 
