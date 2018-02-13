@@ -129,7 +129,8 @@ class Tracker(object):
         bytes_uploaded = self._window_bytes()
         time_window_seconds = (self._window_end_timestamp() -
                                self._window_start_timestamp()).total_seconds()
-        return (bytes_uploaded * 8.0) / time_window_seconds
+        megabits_uploaded = (bytes_uploaded * 8.0) / pow(10, 6)
+        return megabits_uploaded / time_window_seconds
 
     def _record_latest(self):
         self._progress_history.append(
