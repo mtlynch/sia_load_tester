@@ -62,7 +62,7 @@ class Monitor(object):
         """
         while not self._exit_event.is_set():
             if self._progress_is_below_minimum():
-                logging.critical('Signaling for load test to end')
+                logger.critical('Signaling for load test to end')
                 self._exit_event.set()
                 return
             self._sleep_fn(_CHECK_FREQUENCY_IN_SECONDS)
@@ -74,7 +74,7 @@ class Monitor(object):
             return False
 
         if bytes_uploaded < MINIMUM_PROGRESS_THRESHOLD:
-            logging.critical(
+            logger.critical(
                 'Upload progress has slowed below minimum: %d bytes in last %d minutes (minimum=%d)',
                 bytes_uploaded, TIME_WINDOW_MINUTES, MINIMUM_PROGRESS_THRESHOLD)
             return True
@@ -109,14 +109,24 @@ class Tracker(object):
         """
         self._record_latest()
         self._prune_history()
-        bytes_uploaded = self._progress_history[-1].uploaded_bytes - self._progress_history[0].uploaded_bytes
+        bytes_uploaded = self._window_bytes()
         if self._has_complete_time_window():
-            logging.info('%d bytes uploaded in time window', bytes_uploaded)
+            logger.info(
+                '%d bytes uploaded in time window (averaging %.2f Mbps)',
+                bytes_uploaded, self._get_upload_mbps_in_time_window())
             return bytes_uploaded
         else:
-            logging.info('%d bytes uploaded since tracking began',
-                         bytes_uploaded)
+            logger.info('%d bytes uploaded since tracking began',
+                        bytes_uploaded, self._get_upload_mbps_in_time_window())
             return None
+
+    def _get_upload_mbps_in_time_window(self):
+        if len(self._progress_history) < 2:
+            return 0
+        bytes_uploaded = self._window_bytes()
+        time_window_seconds = (self._window_end_timestamp() -
+                               self._window_start_timestamp()).total_seconds()
+        return (bytes_uploaded * 8.0) / time_window_seconds
 
     def _record_latest(self):
         self._progress_history.append(
@@ -136,21 +146,30 @@ class Tracker(object):
         # than the latest record.
         for i in range(len(self._progress_history) - 1, 0, -1):
             entry = self._progress_history[i]
-            if ((self._latest_timestamp() - entry.timestamp) >=
+            if ((self._window_end_timestamp() - entry.timestamp) >=
                     datetime.timedelta(minutes=TIME_WINDOW_MINUTES)):
                 # Trim all entries prior to the current entry. Make this entry
                 # the oldest.
                 self._progress_history = self._progress_history[i:]
                 return
 
-    def _earliest_timestamp(self):
+    def _window_bytes(self):
+        return self._window_end_bytes() - self._window_start_bytes()
+
+    def _window_start_bytes(self):
+        return self._progress_history[0].uploaded_bytes
+
+    def _window_end_bytes(self):
+        return self._progress_history[-1].uploaded_bytes
+
+    def _window_start_timestamp(self):
         return self._progress_history[0].timestamp
 
-    def _latest_timestamp(self):
+    def _window_end_timestamp(self):
         return self._progress_history[-1].timestamp
 
     def _has_complete_time_window(self):
-        return (self._latest_timestamp() - self._earliest_timestamp()
+        return (self._window_end_timestamp() - self._window_start_timestamp()
                ) >= datetime.timedelta(minutes=TIME_WINDOW_MINUTES)
 
 
