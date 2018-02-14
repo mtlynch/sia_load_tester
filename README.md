@@ -23,7 +23,6 @@ The load test is platform-agnostic and will work on any system that provides a P
 ```ps
 # Directory in which to install tools for Sia load test.
 $Env:SIA_TOOLS_DIR="c:\sia-tools"
-
 mkdir $ENV:SIA_TOOLS_DIR
 cd $ENV:SIA_TOOLS_DIR
 
@@ -57,30 +56,23 @@ $Env:SIA_UPLOAD_DATA_DIR="$Env:SIA_TEST_ROOT\data"
 
 To perform the load test, you will need data to upload to Sia.
 
-To generate simulated data, you can use the [dummy_file_generator](https://github.com/mtlynch/dummy_file_generator):
-
-Specify the environment variables to defined how much data to generate and where to store it:
-
-```ps
-# Target directory and file prefix for output files.
-
-$Env:OUTPUT_PREFIX="$Env:SIA_UPLOAD_DATA_DIR\dummy-"
-
-# Minimum amount of data to generate.
-$Env:TOTAL_DATA_SIZE=1099511627776 # 1 TB
-```
+To generate simulated data, you can use the [dummy_file_generator](https://github.com/mtlynch/dummy_file_generator).
 
 #### Optimal case
 
 To test Sia's optimal case, generate files of 41942760 bytes each:
 
 ```ps
-$Env:SIZE_PER_FILE=41942760 # ~40 MiB
+# Target directory and file prefix for output files.
+$Env:OUTPUT_PREFIX="$Env:SIA_UPLOAD_DATA_DIR\optimal-case-40MiB-files\dummy-"
 
-python dummy_file_generator\main.py \
-  --size_per_file $Env:SIZE_PER_FILE \
-  --total_size $Env:TOTAL_DATA_SIZE \
-  --output_prefix $Env:$OUTPUT_PREFIX
+$Env:SIZE_PER_FILE="41942760"         # ~40 MiB
+$Env:TOTAL_DATA_SIZE="10995116277760" # 10 TiB
+
+python ""$Env:SIA_TOOLS_DIR\dummy_file_generator\dummy_file_generator\main.py" `
+  --size_per_file "$Env:SIZE_PER_FILE" `
+  --total_size "$Env:TOTAL_DATA_SIZE" `
+  --output_prefix "$Env:$OUTPUT_PREFIX"
 ```
 
 #### Worst case
@@ -88,12 +80,16 @@ python dummy_file_generator\main.py \
 To test Sia's worst case, generate files of 1 byte each:
 
 ```ps
-SIZE_PER_FILE=1
+# Target directory and file prefix for output files.
+$Env:OUTPUT_PREFIX="$Env:SIA_UPLOAD_DATA_DIR\worst-case-1B-files\dummy-"
 
-python dummy_file_generator\main.py \
-  --size_per_file "$SIZE_PER_FILE" \
-  --total_size "$TOTAL_DATA_SIZE" \
-  --output_prefix "$OUTPUT_PREFIX"
+$Env:SIZE_PER_FILE="1"          # 1 byte
+$Env:TOTAL_DATA_SIZE="250000"   # ~244 KiB
+
+python "$Env:SIA_TOOLS_DIR\dummy_file_generator\dummy_file_generator\main.py" `
+  --size_per_file "$Env:SIZE_PER_FILE" `
+  --total_size "$Env:TOTAL_DATA_SIZE" `
+  --output_prefix "$Env:OUTPUT_PREFIX"
 ```
 
 ### Step 2: Prepare Sia
