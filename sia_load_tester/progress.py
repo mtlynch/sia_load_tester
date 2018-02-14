@@ -14,9 +14,9 @@ import sia_client as sc
 
 logger = logging.getLogger(__name__)
 
-# Sia must make at least 1 GiB of upload progress within the past hour window.
+# Sia must average at least 3 Mbps upload speed in the past hour window.
 TIME_WINDOW_MINUTES = 60
-MINIMUM_PROGRESS_THRESHOLD = pow(2, 30)
+MINIMUM_PROGRESS_THRESHOLD = 1350000000  # ~1.26 GiB
 
 _CHECK_FREQUENCY_IN_SECONDS = 60
 
