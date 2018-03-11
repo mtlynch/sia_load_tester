@@ -20,7 +20,7 @@ The load test is platform-agnostic and will work on any system that provides a P
 
 ## Installation
 
-```ps
+```powershell
 # Directory in which to install tools for Sia load test.
 $Env:SIA_TOOLS_DIR="c:\sia-tools"
 mkdir $ENV:SIA_TOOLS_DIR
@@ -39,7 +39,7 @@ pip install -r requirements.txt
 popd
 ```
 
-```ps
+```powershell
 $Env:SIA_TEST_ROOT="D:\sia-test"
 mkdir $Env:SIA_TEST_ROOT
 
@@ -62,7 +62,7 @@ To generate simulated data, you can use the [dummy_file_generator](https://githu
 
 To test Sia's optimal case, generate files of 41942760 bytes each:
 
-```ps
+```powershell
 # Target directory and file prefix for output files.
 $Env:OUTPUT_PREFIX="$Env:SIA_UPLOAD_DATA_DIR\optimal-case-40MiB-files\dummy-"
 
@@ -79,7 +79,7 @@ python ""$Env:SIA_TOOLS_DIR\dummy_file_generator\dummy_file_generator\main.py" `
 
 To test Sia's worst case, generate files of 1 byte each:
 
-```ps
+```powershell
 # Target directory and file prefix for output files.
 $Env:OUTPUT_PREFIX="$Env:SIA_UPLOAD_DATA_DIR\worst-case-1B-files\dummy-"
 
@@ -96,13 +96,13 @@ python "$Env:SIA_TOOLS_DIR\dummy_file_generator\dummy_file_generator\main.py" `
 
 In a separate terminal window, start the siad command-line daemon:
 
-```ps
+```powershell
 .\siad --modules cgtwr
 ```
 
 Use siac to unlock your wallet.
 
-```ps
+```powershell
 .\siac wallet unlock
 ```
 
@@ -112,7 +112,7 @@ You don't need to create renter contracts, as the load tester will automatically
 
 The Sia metrics collector regularly polls Sia to gather metrics about its performance. It's not strictly necessary to the load test, but it captures useful data about Sia's behavior.
 
-```ps
+```powershell
 python "$Env:SIA_TOOLS_DIR\sia_metrics_collector\sia_metrics_collector\main.py"`
   --poll_frequency 60 `
   --output_file "$Env:SIA_TEST_OUTPUT\metrics.csv"
@@ -124,7 +124,7 @@ You can run the load test using an existing directory or by generating dummy dat
 
 Specify the data directory using the `--dataset_root` flag. The load tester will find all files in the directory recursively and upload all files in that directory that have not already been uploaded to Sia.
 
-```ps
+```powershell
 # Specify the directory in which the upload test data is located.
 
 python "$Env:SIA_TOOLS_DIR\sia_load_tester\sia_load_tester\main.py"`
