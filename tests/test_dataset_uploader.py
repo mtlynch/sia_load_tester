@@ -20,9 +20,9 @@ class DatasetUploaderTest(unittest.TestCase):
         self.exit_event = threading.Event()
 
     def test_uploads_nothing_when_all_files_are_on_sia(self):
-        dummy_dataset = dataset.Dataset('/dummy-path', [
-            '/dummy-path/a.txt', '/dummy-path/b.txt', '/dummy-path/c.txt'
-        ])
+        dummy_dataset = dataset.Dataset(
+            '/dummy-path',
+            ['/dummy-path/a.txt', '/dummy-path/b.txt', '/dummy-path/c.txt'])
         self.mock_sia_api_impl.get_renter_files.return_value = {
             u'files': [
                 {
@@ -74,9 +74,9 @@ class DatasetUploaderTest(unittest.TestCase):
         self.assertTrue(self.exit_event.is_set())
 
     def test_uploads_file_when_one_is_missing_from_sia(self):
-        dummy_dataset = dataset.Dataset('/dummy-path', [
-            '/dummy-path/a.txt', '/dummy-path/b.txt', '/dummy-path/c.txt'
-        ])
+        dummy_dataset = dataset.Dataset(
+            '/dummy-path',
+            ['/dummy-path/a.txt', '/dummy-path/b.txt', '/dummy-path/c.txt'])
         self.mock_sia_api_impl.get_renter_files.return_value = {
             u'files': [
                 {

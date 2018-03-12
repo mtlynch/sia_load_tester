@@ -11,8 +11,7 @@ logger = logging.getLogger(__name__)
 
 def make_dataset_uploader(upload_queue, exit_event):
     """Factory for creating a DatasetUploader using production settings."""
-    return DatasetUploader(upload_queue,
-                           sc.make_sia_client(),
+    return DatasetUploader(upload_queue, sc.make_sia_client(),
                            sia_conditions.make_waiter(exit_event), exit_event)
 
 
