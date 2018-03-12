@@ -22,7 +22,7 @@ The load test is platform-agnostic and will work on any system that provides a P
 
 ```powershell
 # Directory in which to install tools for Sia load test.
-$Env:SIA_TOOLS_DIR="c:\sia-tools"
+$Env:SIA_TOOLS_DIR="C:\sia-tools"
 mkdir $ENV:SIA_TOOLS_DIR
 cd $ENV:SIA_TOOLS_DIR
 
@@ -125,9 +125,12 @@ You can run the load test using an existing directory or by generating dummy dat
 Specify the data directory using the `--dataset_root` flag. The load tester will find all files in the directory recursively and upload all files in that directory that have not already been uploaded to Sia.
 
 ```powershell
-# Specify the directory in which the upload test data is located.
-
 python "$Env:SIA_TOOLS_DIR\sia_load_tester\sia_load_tester\main.py"`
   --dataset_root $Env:SIA_UPLOAD_DATA_DIR `
   --output_dir $Env:SIA_TEST_OUTPUT
 ```
+
+The load tester will automatically exit when one of the following occurs:
+
+* All files in dataset root have been fully uploaded.
+* Upload bandwidth has dropped below 3 Mbps in a full one hour time window.
