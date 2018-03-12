@@ -46,7 +46,6 @@ class DatasetUploader(object):
             job = self._upload_queue.get()
             if (not self._process_upload_job_async(job)) and (job.failure_count
                                                               < 3):
-                logger.error('Adding to the queue again')
                 self._upload_queue.put(job)
         self._sia_condition_waiter.wait_for_all_uploads_to_complete()
         self._exit_event.set()
