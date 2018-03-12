@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 
 def make_dataset_uploader(upload_queue, exit_event):
     """Factory for creating a DatasetUploader using production settings."""
-    return DatasetUploader(upload_queue, sc.make_sia_client(),
+    return DatasetUploader(upload_queue,
+                           sc.make_sia_client(),
                            sia_conditions.make_waiter(exit_event), exit_event)
 
 
@@ -44,7 +45,9 @@ class DatasetUploader(object):
             logger.info('%d files left to upload', self._upload_queue.qsize())
             self._sia_condition_waiter.wait_for_available_upload_slot()
             job = self._upload_queue.get()
-            if not self._process_upload_job_async(job):
+            if (not self._process_upload_job_async(job)) and (job.failure_count
+                                                              < 3):
+                logger.error('Adding to the queue again')
                 self._upload_queue.put(job)
         self._sia_condition_waiter.wait_for_all_uploads_to_complete()
         self._exit_event.set()
@@ -54,6 +57,15 @@ class DatasetUploader(object):
 
         Args:
             job: Sia upload job to process.
+
+        Returns:
+            True if upload job was sent to Sia successfully.
         """
         logger.info('Uploading file to Sia: %s', job.local_path)
-        return self._sia_client.upload_file_async(job.local_path, job.sia_path)
+        try:
+            return self._sia_client.upload_file_async(job.local_path,
+                                                      job.sia_path)
+        except Exception as ex:
+            logger.error('Upload failed: %s', ex.message)
+            job.increment_failure_count()
+            return False

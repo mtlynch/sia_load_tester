@@ -79,10 +79,12 @@ class Job(object):
     def __init__(self, local_path, sia_path):
         self._local_path = local_path
         self._sia_path = sia_path
+        self._failure_count = 0
 
     def __eq__(self, other):
         return ((self.local_path == other.local_path) and
-                (self.sia_path == other.sia_path))
+                (self.sia_path == other.sia_path) and
+                (self.failure_count == other.failure_count))
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -91,6 +93,9 @@ class Job(object):
         return '%s(%s -> %s)' % (self.__class__.__name__, self._local_path,
                                  self._sia_path)
 
+    def increment_failure_count(self):
+        self._failure_count += 1
+
     @property
     def local_path(self):
         return self._local_path
@@ -98,3 +103,7 @@ class Job(object):
     @property
     def sia_path(self):
         return self._sia_path
+
+    @property
+    def failure_count(self):
+        return self._failure_count

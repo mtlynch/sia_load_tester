@@ -134,3 +134,9 @@ class JobTest(unittest.TestCase):
         self.assertNotEqual(a, b)
         self.assertNotEqual(a, c)
         self.assertNotEqual(b, c)
+
+    def test_increment_failure_count(self):
+        a = upload_queue.Job(local_path='/foo/bar.txt', sia_path='bar.txt')
+        self.assertEqual(0, a.failure_count)
+        a.increment_failure_count()
+        self.assertEqual(1, a.failure_count)

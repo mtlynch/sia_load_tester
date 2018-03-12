@@ -15,12 +15,12 @@ class DatasetTest(unittest.TestCase):
         shutil.rmtree(self.test_dir)
 
     def test_dataset_sorts_paths(self):
-        d = dataset.Dataset(
-            '/dummy-root',
-            ['c/foo.txt', 'a/100.jpg', 'a/105.jpg', 'a/102.jpg', 'b/bar.txt'])
+        d = dataset.Dataset('/dummy-root', [
+            'c/foo.txt', 'a/100.jpg', 'a/105.jpg', 'a/102.jpg', 'b/bar.txt'
+        ])
         self.assertEqual(
-            ['a/100.jpg', 'a/102.jpg', 'a/105.jpg', 'b/bar.txt', 'c/foo.txt'],
-            d.paths)
+            ['a/100.jpg', 'a/102.jpg', 'a/105.jpg', 'b/bar.txt',
+             'c/foo.txt'], d.paths)
 
     def test_load_from_path_empty_directory_makes_dataset_with_zero_paths(self):
         d = dataset.load_from_path(self.test_dir)
