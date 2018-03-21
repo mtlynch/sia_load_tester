@@ -69,10 +69,10 @@ $Env:OUTPUT_PREFIX="$Env:SIA_UPLOAD_DATA_DIR\optimal-case-40MiB-files\dummy-"
 $Env:SIZE_PER_FILE="41942760"         # ~40 MiB
 $Env:TOTAL_DATA_SIZE="10995116277760" # 10 TiB
 
-python ""$Env:SIA_TOOLS_DIR\dummy_file_generator\dummy_file_generator\main.py" `
+python "$Env:SIA_TOOLS_DIR\dummy_file_generator\dummy_file_generator\main.py" `
   --size_per_file "$Env:SIZE_PER_FILE" `
   --total_size "$Env:TOTAL_DATA_SIZE" `
-  --output_prefix "$Env:$OUTPUT_PREFIX"
+  --output_prefix "$Env:OUTPUT_PREFIX"
 ```
 
 #### Worst case
