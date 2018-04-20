@@ -19,7 +19,7 @@ class GenerateUploadJobsTest(unittest.TestCase):
 
     def test_generates_empty_job_list_when_dataset_is_empty(self):
         input_dataset = dataset.Dataset('/dummy-path', [])
-        self.assertEqual([], jobs.from_dataset(input_dataset))
+        self.assertEqual([], jobs.from_dataset(input_dataset, dataset_copies=1))
 
     def test_generates_correct_jobs_from_dataset(self):
         input_dataset = dataset.Dataset('/dummy-path', [
@@ -33,7 +33,53 @@ class GenerateUploadJobsTest(unittest.TestCase):
                 local_path='/dummy-path/fiz/baz/c.txt',
                 sia_path='fiz/baz/c.txt'),
             jobs.Job(local_path='/dummy-path/foo/b.txt', sia_path='foo/b.txt'),
-        ], jobs.from_dataset(input_dataset))
+        ], jobs.from_dataset(input_dataset, dataset_copies=1))
+
+    def test_zero_dataset_copies_raises_exception(self):
+        input_dataset = dataset.Dataset('/dummy-path', [
+            '/dummy-path/a.txt',
+            '/dummy-path/fiz/baz/c.txt',
+        ])
+        with self.assertRaises(jobs.InvalidCopyCountError):
+            jobs.from_dataset(input_dataset, dataset_copies=0)
+
+    def test_negative_dataset_copies_raises_exception(self):
+        input_dataset = dataset.Dataset('/dummy-path', [
+            '/dummy-path/a.txt',
+            '/dummy-path/fiz/baz/c.txt',
+        ])
+        with self.assertRaises(jobs.InvalidCopyCountError):
+            jobs.from_dataset(input_dataset, dataset_copies=-5)
+
+    def test_too_many_dataset_copies_raises_exception(self):
+        input_dataset = dataset.Dataset('/dummy-path', [
+            '/dummy-path/a.txt',
+            '/dummy-path/fiz/baz/c.txt',
+        ])
+        with self.assertRaises(jobs.InvalidCopyCountError):
+            jobs.from_dataset(
+                input_dataset, dataset_copies=(jobs.MAX_DATASET_COPIES + 1))
+
+    def test_creates_jobs_for_copies(self):
+        input_dataset = dataset.Dataset('/dummy-path', [
+            '/dummy-path/a.txt',
+            '/dummy-path/fiz/baz/c.txt',
+        ])
+        jobs.from_dataset(input_dataset, dataset_copies=3)
+        self.assertEqual([
+            jobs.Job(local_path='/dummy-path/a.txt', sia_path='a-00000000.txt'),
+            jobs.Job(
+                local_path='/dummy-path/fiz/baz/c.txt',
+                sia_path='fiz/baz/c-00000000.txt'),
+            jobs.Job(local_path='/dummy-path/a.txt', sia_path='a-00000001.txt'),
+            jobs.Job(
+                local_path='/dummy-path/fiz/baz/c.txt',
+                sia_path='fiz/baz/c-00000001.txt'),
+            jobs.Job(local_path='/dummy-path/a.txt', sia_path='a-00000002.txt'),
+            jobs.Job(
+                local_path='/dummy-path/fiz/baz/c.txt',
+                sia_path='fiz/baz/c-00000002.txt'),
+        ], jobs.from_dataset(input_dataset, dataset_copies=3))
 
     # Patch out relpath to simulate a Windows environment.
     @mock.patch.object(os.path, 'relpath')
@@ -53,7 +99,7 @@ class GenerateUploadJobsTest(unittest.TestCase):
                 sia_path='fiz/baz/c.txt'),
             jobs.Job(
                 local_path=r'C:\dummy-root\foo\b.txt', sia_path='foo/b.txt'),
-        ], jobs.from_dataset(input_dataset))
+        ], jobs.from_dataset(input_dataset, dataset_copies=1))
 
 
 class JobTest(unittest.TestCase):
