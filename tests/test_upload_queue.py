@@ -3,7 +3,7 @@ import unittest
 
 import mock
 
-from sia_load_tester import dataset
+from sia_load_tester import jobs
 from sia_load_tester import sia_client as sc
 from sia_load_tester import upload_queue
 
@@ -22,10 +22,13 @@ class GenerateUploadQueueTest(unittest.TestCase):
         os.path.sep = self.original_path_sep
 
     def test_generates_empty_queue_when_all_files_already_on_sia(self):
-        dummy_dataset = dataset.Dataset('/dummy-path', [
-            '/dummy-path/a.txt', '/dummy-path/foo/b.txt',
-            '/dummy-path/fiz/baz/c.txt'
-        ])
+        upload_jobs = [
+            jobs.Job(local_path='/dummy-path/a.txt', sia_path='a.txt'),
+            jobs.Job(local_path='/dummy-path/foo/b.txt', sia_path='foo/b.txt'),
+            jobs.Job(
+                local_path='/dummy-path/fiz/baz/c.txt',
+                sia_path='fiz/baz/c.txt')
+        ]
         self.mock_sia_api_impl.get_renter_files.return_value = {
             u'files': [
                 {
@@ -42,7 +45,7 @@ class GenerateUploadQueueTest(unittest.TestCase):
                 {
                     u'available': True,
                     u'redundancy': 3.5,
-                    u'siapath': u'b.txt',
+                    u'siapath': u'foo/b.txt',
                     u'localpath': u'/dummy-path/foo/b.txt',
                     u'uploadprogress': 100,
                     u'renewing': True,
@@ -53,7 +56,7 @@ class GenerateUploadQueueTest(unittest.TestCase):
                 {
                     u'available': True,
                     u'redundancy': 3.5,
-                    u'siapath': u'c.txt',
+                    u'siapath': u'fiz/baz/c.txt',
                     u'localpath': u'/dummy-path/fiz/baz/c.txt',
                     u'uploadprogress': 100,
                     u'renewing': True,
@@ -64,79 +67,31 @@ class GenerateUploadQueueTest(unittest.TestCase):
             ]
         }
 
-        queue = upload_queue.from_dataset_and_sia_client(
-            dummy_dataset, self.mock_sia_client)
+        queue = upload_queue.from_upload_jobs_and_sia_client(
+            upload_jobs, self.mock_sia_client)
 
         self.assertEqual(0, queue.qsize())
 
     def test_generates_upload_queue_when_no_files_are_on_sia(self):
-        input_dataset = dataset.Dataset('/dummy-root', [
-            '/dummy-root/a.txt',
-            '/dummy-root/fiz/baz/c.txt',
-            '/dummy-root/foo/b.txt',
-        ])
+        upload_jobs = [
+            jobs.Job(local_path='/dummy-root/a.txt', sia_path='a.txt'),
+            jobs.Job(
+                local_path='/dummy-root/fiz/baz/c.txt',
+                sia_path='fiz/baz/c.txt'),
+            jobs.Job(local_path='/dummy-root/foo/b.txt', sia_path='foo/b.txt'),
+        ]
         self.mock_sia_api_impl.get_renter_files.return_value = {u'files': []}
 
-        queue = upload_queue.from_dataset_and_sia_client(
-            input_dataset, self.mock_sia_client)
+        queue = upload_queue.from_upload_jobs_and_sia_client(
+            upload_jobs, self.mock_sia_client)
 
         self.assertEqual(
-            upload_queue.Job(local_path='/dummy-root/a.txt', sia_path='a.txt'),
+            jobs.Job(local_path='/dummy-root/a.txt', sia_path='a.txt'),
             queue.get())
         self.assertEqual(
-            upload_queue.Job(
+            jobs.Job(
                 local_path='/dummy-root/fiz/baz/c.txt',
                 sia_path='fiz/baz/c.txt'), queue.get())
         self.assertEqual(
-            upload_queue.Job(
-                local_path='/dummy-root/foo/b.txt', sia_path='foo/b.txt'),
+            jobs.Job(local_path='/dummy-root/foo/b.txt', sia_path='foo/b.txt'),
             queue.get())
-
-    # Patch out relpath to simulate a Windows environment.
-    @mock.patch.object(os.path, 'relpath')
-    def test_converts_path_separators_on_windows(self, relpath_patch):
-        os.path.sep = '\\'
-        relpath_patch.side_effect = lambda p, _: p[len('C:\\dummy-root\\'):]
-
-        input_dataset = dataset.Dataset(r'C:\dummy-root', [
-            r'C:\dummy-root\a.txt',
-            r'C:\dummy-root\fiz\baz\c.txt',
-            r'C:\dummy-root\foo\b.txt',
-        ])
-        self.mock_sia_api_impl.get_renter_files.return_value = {u'files': []}
-
-        queue = upload_queue.from_dataset_and_sia_client(
-            input_dataset, self.mock_sia_client)
-
-        self.assertEqual(
-            upload_queue.Job(
-                local_path=r'C:\dummy-root\a.txt', sia_path='a.txt'),
-            queue.get())
-        self.assertEqual(
-            upload_queue.Job(
-                local_path=r'C:\dummy-root\fiz\baz\c.txt',
-                sia_path='fiz/baz/c.txt'), queue.get())
-        self.assertEqual(
-            upload_queue.Job(
-                local_path=r'C:\dummy-root\foo\b.txt', sia_path='foo/b.txt'),
-            queue.get())
-
-
-class JobTest(unittest.TestCase):
-
-    def test_equality(self):
-        a = upload_queue.Job(local_path='/foo/bar.txt', sia_path='bar.txt')
-        a_copy = upload_queue.Job(local_path='/foo/bar.txt', sia_path='bar.txt')
-        b = upload_queue.Job(local_path='/bar/foo.txt', sia_path='foo.txt')
-        c = upload_queue.Job(local_path='/cat/bear.txt', sia_path='bear.txt')
-
-        self.assertEqual(a, a_copy)
-        self.assertNotEqual(a, b)
-        self.assertNotEqual(a, c)
-        self.assertNotEqual(b, c)
-
-    def test_increment_failure_count(self):
-        a = upload_queue.Job(local_path='/foo/bar.txt', sia_path='bar.txt')
-        self.assertEqual(0, a.failure_count)
-        a.increment_failure_count()
-        self.assertEqual(1, a.failure_count)
