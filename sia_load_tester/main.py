@@ -47,7 +47,7 @@ def main(args):
     contracts.ensure_min_contracts()
 
     input_dataset = dataset.load_from_path(args.dataset_root)
-    upload_jobs = jobs.from_dataset(input_dataset)
+    upload_jobs = jobs.from_dataset(input_dataset, args.dataset_copies)
     queue = upload_queue.from_upload_jobs(upload_jobs)
 
     exit_event = threading.Event()
@@ -74,6 +74,12 @@ if __name__ == '__main__':
         '--dataset_root',
         required=True,
         help='Path to root directory of data to upload to Sia')
+    parser.add_argument(
+        '-n',
+        '--dataset_copies',
+        default=1,
+        type=int,
+        help='The number of times to upload each input file to Sia')
     parser.add_argument(
         '-o',
         '--output_dir',
